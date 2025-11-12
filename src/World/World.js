@@ -1,4 +1,5 @@
 import * as THREE from "three";
+import { RGBELoader } from 'three/addons/loaders/RGBELoader.js';
 
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { GuiControls } from './systems/GuiControls.js';
@@ -32,7 +33,7 @@ class World {
     this.scene.add(mainGroup);
 
     // Floor
-    mainGroup.add(Floor.createBoxFloor(20, 20, 0.4));
+    mainGroup.add(Floor.createBoxFloor(7, 7, 0.4));
 
     // Ambient light
     const ambientLight = Light.createAmbientLight(0xffffff, 0.5);
@@ -55,8 +56,14 @@ class World {
       mainGroup.add(directionalLight);
     }
 
-    // Background
-    Scene.setBackgroundTexture(this.scene, 'src/World/assets/textures/backgrounds/starry_night_sky.jpg');
+    // Load HDR background
+    new RGBELoader()
+      .setPath('./src/World/assets/textures/backgrounds/')
+      .load('HDR_029_Sky_Cloudy_Ref.hdr', (texture) => {
+        texture.mapping = THREE.EquirectangularReflectionMapping;
+        this.scene.background = texture;
+        this.scene.environment = texture;
+      });
 
     // GUI
     const guiControls = new GuiControls();
